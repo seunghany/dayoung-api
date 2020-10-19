@@ -4,11 +4,11 @@ from sqlalchemy.ext.declarative import declarative_base
 db = SQLAlchemy()
 Base = declarative_base()
 config = {
-    'user' : 'root',
-    'password' : 'root',
-    'host': '127.0.0.1',
+    'user' : '',
+    'password' : '',
+    'host': '',
     'port' : '3306',
-    'database' : 'mariadb'
+    'database' : ''
 }
 charset = {'utf8':'utf8'}
 url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
