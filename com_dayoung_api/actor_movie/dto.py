@@ -1,8 +1,8 @@
 from com_sba_api.ext.db import db
 
-class User_MovieDto(db.Model):
+class Actor_MovieDto(db.Model):
 
-    __tablename__ = 'User_Movie'
+    __tablename__ = 'Actor_Movie'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     userid: str = db.Column(db.String(30))
@@ -20,8 +20,7 @@ class User_MovieDto(db.Model):
     def json(self):
         return {
             'userid' : self.userid,
-            'password' : self.password,
-            'name' : self.name
+            'moveid' : self.movieid
         }
 
     def save(self):

@@ -8,13 +8,15 @@ class UserDto(db.Model):
     password: str = db.Column(db.String(30),)
     name: str = db.Column(db.String(30))
     age: int = db.Column(db.Integer)
+    date_Of_Birth: str = db.Column(db.String(30))
     gender: str = db.Column(db.String(30))
 
-    def __init__(self, userid, password, name, age, gender):
+    def __init__(self, userid, password, name, age, date_Of_Birth, gender):
         self.userid = userid
         self.password = password
         self.name = name
         self.age = age
+        self.date_Of_Birth = date_Of_Birth
         self.gender = gender
 
     def __repr__(self):
@@ -28,6 +30,7 @@ class UserDto(db.Model):
             'password' : self.password,
             'name' : self.name,
             'age' : self.age,
+            'date_Of_Birth' : self.date_Of_Birth,
             'gender': self.gender
         }
 

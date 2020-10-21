@@ -2,7 +2,7 @@
 from com_sba_api.ext.db import db
 
 
-class UserDao():
+class Actor_MovieDao():
 
     @classmethod
     def find_all(cls):
