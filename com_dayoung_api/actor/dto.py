@@ -6,44 +6,48 @@ from sqlalchemy import create_engine
 class ActorDto(db.Model):
     __tablename__ = 'actors'
     __table_args__={'mysql_collate':'utf8_general_ci'}
-
+    # columns=['photo_url', 'age','name','real_name','religion','agency', 'spouse', 'children','debut_year','actor_id']
     actorid = str = db.Column(db.String(30), primary_key = True, index = True)
-    photo: str = db.Column(db.String(100))
+    photo_url: str = db.Column(db.String(100))
     name: str = db.Column(db.String(30))
     age: str = db.Column(db.String(30))
     real_name: str = db.Column(db.String(30))
+    religion: str = db.Column(db.String(30))
+    agency: str = db.Column(db.String(30))
     spouse: str = db.Column(db.String(30))
     children: str = db.Column(db.Integer)
     debut_year: int = db.Column(db.Integer)
 
-    def __init__(self, photo, actorId, name, age, real_name, spouse, children, debut_year):
-        self.photo = photo
-        self.actorId = actorId
+    def __init__(self, photo_url, actorid, name, age, real_name, spouse, children, debut_year, agency, religion):
+        self.photo_url = photo_url
+        self.actorid = actorid
         self.name = name
         self.age = age
         self.real_name = real_name
+        self.religion = religion
+        self.agency = agency
         self.spouse = spouse
         self.children = children
         self.debut_year = debut_year
 
-    def __repr__(self):
-        return f'Actors(id={self.id}, user={self.userid}, \
-                password={self.password}, name={self.name})'
+    # def __repr__(self):
+    #     return f'Actors(id={self.id}, user={self.userid}, \
+    #             password={self.password}, name={self.name})'
 
     
-    # 소속사 추가
-    # 
     @property
     def json(self):
         return {
-            'photo' : self.photo,
-            'actorId' : self.actorId,
+            'photo_url' : self.photo_url,
+            'actorId' : self.actorid,
             'name' : self.name,
             'age' : self.age,
             'real_name' : self.real_name,
             'spouse' : self.spouse,
             'children' : self.children,
-            'debut_year' : self.debut_year
+            'debut_year' : self.debut_year,
+            'religion' : self.religion,
+            'agency' : self.agency
         }
 
     def save(self):
