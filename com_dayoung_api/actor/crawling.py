@@ -1,162 +1,86 @@
+import requests
 from bs4 import BeautifulSoup
-from urllib.request import urlopen
-import os, shutil
+import re # 정규식 사용
+import csv
 from pandas import DataFrame
-import pandas as pd
 
-class Service:
-    def __init__(self):
-        self.entity = Entity()
-        pass
+class Crawling:
+    '''
+        Crawls data from wikipedia with following information
+        attributes: ['사진', '나이','이름','본명','종교','소속사', '배우자', '자녀','데뷔년도']
+        returns Dataframe with above attributes
+        '''
+    def __init__(self, actors_name = ['이병헌']):
+        self.actors_name = actors_name
 
-    def bugs_music(self):
-        pass
+    def crawl(self):
+        # columns=['사진', '나이','이름','본명','종교','소속사', '배우자', '자녀','데뷔년도']
+        # url = "https://ko.wikipedia.org/wiki/"
+        headers = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36"}
+        # actors_name =["수지", "이병헌","전지현","손예진","안소희","하지원","강동원","하정우","김혜수","현빈" ,"유해진","송강호"]
+        # actors_name = ["손예진"]
+        actors = []
+        actors_name = self.actors_name
+        for name in actors_name :
+            url = "https://ko.wikipedia.org/wiki/"
+            url += name
+            res = requests.get(url, headers=headers)
+            res.raise_for_status() # 혹시 문제가 있을시 에러
+            soup = BeautifulSoup(res.text, 'lxml')
+            # --------------------------------------------- 위키 드감
+            table = soup.find('table', attrs = {"class":"infobox"})
+            actor_info = {}
+            # if table.has_next
+            if table:
+                tables = table.find_all("tr")
+                url_table = tables[1].find('a',attrs={"class":"image"})
+                url2 = url_table.find('img')['src']
+                actor_info['사진'] = url2
+                tables = tables[2:]
+                actor = {}
+                for table in tables:
+                    th = table.th.get_text()
+                    td = table.td.get_text()
+                    actor[th] = td
+                # 데이터 정리
+                # 출생 -> 나이
+                p = re.compile("..세") # 30세 56세 등등
+                age = p.search(actor['출생']).group(0)
+                age = age[:-1]
+                actor_info['나이'] = age
+                
+                # 가명 없을 시 없다고 표시 본명에 가명 없음 이라고 표시
+                actor_info['이름'] = name
+                if '본명' not in actor.keys():
+                    actor_info['본명'] = '가명 없음'
+                else:
+                    actor_info['본명'] = actor['본명']
+                # 종교
+                if '종교' not in actor.keys():
+                    actor_info['종교'] = '없음'
+                else:
+                    actor_info['종교'] = actor['종교']
+                # 소속사는 다 있음
+                actor_info['소속사'] = actor['소속사']
+                # 배우자
+                if '배우자' not in actor.keys():
+                    actor_info['배우자'] = '없음'
+                else:
+                    actor_info['배우자'] = actor['배우자']
+                # 자녀
+                if '자녀' not in actor.keys():
+                    actor_info['자녀'] = '없음'
+                else:
+                    actor_info['자녀'] = actor['자녀']
+                # 활동 기간 - 정규식 이용
+                # 데뷔년도
+                p = re.compile('....년')
+                debut_year = p.findall(actor['활동 기간'])[0][:-1]
+                actor_info['데뷔년도'] = debut_year
+                actors.append(actor_info)
 
-    def naver_movie(self):
-        pass
-    
-    def naver_cartoon(self):
-        pass
+            else:
+                print(name, "이름의 유명인이 많음으로 인해 제외 합니다")
+        data = DataFrame(actors, columns=['사진', '나이','이름','본명','종교','소속사', '배우자', '자녀','데뷔년도','아무개'])
+        return data
 
-    def naver_cartoon(self, url):
-        myparser = 'html.parser' # html.parser : 간단한 HTML과 XHTML 구문 분석기. 표준 라이브러리
-        myurl = 'https://comic.naver.com/webtoon/weekday.nhn'
-        response = urlopen(myurl)
-        soup = BeautifulSoup(response, myparser)
-        print(type(soup))
-
-    def create_foler_weekend(self):
-        weekday_dict = {'mon': '월요일', 'tue': '화요일', 'wed': '수요일', 'thu': '목요일', 'fri': '금요일', 'sat': '토요일', 'sun': '일요일'}
-        # shutil : shell utility : 고수준 파일 연산. 표준 라이브러리
-        
-        myfolder = 'd:\\imsi\\' # 유닉스 기반은 '/'이 구분자
-
-        try:
-            if not os.path.exists(myfolder):
-                os.mkdir(myfolder)
-
-            for mydir in weekday_dict.values():
-                mypath = myfolder + mydir
-
-                if os.path.exists(mypath):
-                    # rmtree : remove tree
-                    shutil.rmtree(mypath)
-                os.mkdir(mypath)
-
-        except FileExistsError as err:
-            print(err)
-    # 네이버 웹툰 크롤링
-    def naver_webtoon(self, soup):
-        category = 'webtoon'
-        mytarget = soup.find_all('div', attrs={'class':'thumb'})
-        print(str(len(mytarget)) + '개의 {} 데이터 수집'.format(category))
-
-        mylist = [] # 데이터를 저장할 리스트
-
-        for abcd in mytarget:
-            myhref = abcd.find('a').attrs['href']
-            myhref = myhref.replace('/webtoon/list.nhn?', '')
-            result = myhref.split('&')
-            # print(myhref)
-            # print(result)
-            mytitleid = result[0].split('=')[1]
-            myweekday = result[1].split('=')[1]
-            # print(mytitleid)
-            # print(myweekday)
-
-            imgtag = abcd.find('img')
-            mytitle = imgtag.attrs['title'].strip()
-            mytitle = mytitle.replace('?', '').replace(':', '')
-            # print(mytitle)
-
-            mysrc = imgtag.attrs['src']
-            # print(mysrc)
-
-            service = Service()
-            service.create_folder(mysrc, mytitle, category)
-            # break
-
-            sublist = []
-            sublist.append(mytitleid)
-            sublist.append(myweekday)
-            sublist.append(mytitle)
-            sublist.append(mysrc)
-            mylist.append(sublist)
-
-        mycolumns = ['타이틀번호', '요일', '제목', '링크']
-        myframe = DataFrame(mylist, columns=mycolumns)
-
-        filename = 'cartoon.csv'
-
-        myframe.to_csv(filename, encoding='utf-8', index=False)
-        print(filename + ' 파일로 저장됨')
-        print(category + '사진 저장 완료')
-
-
-
-    # 네이버 영화 랭킹 크롤링
-    def naver_movie_rank(self, soup):
-        category = 'movie_rank'    
-        mytarget_title = soup.findAll('div', attrs={'class':'thumb'})
-        mytarget_star = soup.findAll('dd', attrs={'class':'star'})
-
-        print(str(len(mytarget_title)) + '개의 %s 데이터 수집' % (category))
-
-        mylist0 = []
-        mylist1 = []
-
-        for aaa0 in mytarget_title:
-            movie_name = aaa0.find('img').attrs['alt']
-            movie_name = movie_name.replace('?', '').replace(':', '')
-            movie_src_full = aaa0.find('img').attrs['src']
-            movie_src = movie_src_full.replace('?type=m99_141_2', '')
-            sublist = []
-
-            sublist.append(movie_name)
-            sublist.append(movie_src)
-
-            mylist0.append(sublist)
-
-            service = Service()
-            service.create_folder(movie_src, movie_name, category)
-
-        for aaa1 in mytarget_star:
-            myhref0 = aaa1.find('a')
-            movie_point_full = myhref0.find('span', attrs={'class':'num'})
-            movie_point = movie_point_full.contents
-
-            movie_reserve_full = aaa1.find('div', attrs={'class':'star_t1 b_star'})
-
-            try:
-                movie_reserve = movie_reserve_full.find('span', attrs={'class':'num'}).contents
-
-            except AttributeError as err:
-                # print(err)
-                movie_reserve = '미개봉'
-
-            sublist = []
-
-            sublist.append(movie_point)
-            sublist.append(movie_reserve)
-
-            mylist1.append(sublist)
-
-        # print(mylist0)
-        # print('-'*30)
-        # print(mylist1)
-
-        mycolumns0 = ['제목', '스크린샷']
-        mycolumns1 = ['별점', '예매율']
-        myindex = range(0, len(mylist0))
-        myframe0 = DataFrame(mylist0, index=myindex, columns=mycolumns0)
-        myframe1 = DataFrame(mylist1, index=myindex, columns=mycolumns1)
-
-        myframe = pd.concat([myframe0, myframe1],axis=1)
-        filename = '0920_naver_movie_ranking.csv'
-        myframe.to_csv(filename, encoding='utf-8')
-        print(filename + ' 파일로 저장됨')
-
-    if __name__ == '__main__':
-        sa = Service()
-        sa.naver_cartoon()
-        
