@@ -4,12 +4,6 @@ import pandas as pd
 import xlrd
 import googlemaps
 import json
-'''
-pandas version 1.x 이상 endcoding='UTF-8' 불필요
-ImportError: Missing optional dependency 'xlrd'. 
-pip install xlrd 주의!! anaconda install xlrd 하면 에러 발생
-TEST
-'''
 
 @dataclass
 class FileReader:
