@@ -20,6 +20,8 @@ class FileReader:
     
 
     def new_file(self) -> str:
+        print(os.path.join(self.context,self.fname))
+        
         return os.path.join(self.context,self.fname)
 
     def csv_to_dframe(self) -> object:

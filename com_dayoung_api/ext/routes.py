@@ -14,3 +14,4 @@ def initialize_routes(api):
     api.add_resource(Users, '/Users')
     api.add_resource(Actor, '/Actor<string:id>')
     api.add_resource(Actors, '/Actors')
+    

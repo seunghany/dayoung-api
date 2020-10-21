@@ -1,10 +1,14 @@
 from com_dayoung_api.ext.db import db
+from com_dayoung_api.actor.pro import ActorPro
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy import create_engine
 
 class ActorDto(db.Model):
     __tablename__ = 'actors'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     actorid = str = db.Column(db.String(30), primary_key = True, index = True)
+    photo: str = db.Column(db.String(100))
     name: str = db.Column(db.String(30))
     age: str = db.Column(db.String(30))
     real_name: str = db.Column(db.String(30))
@@ -12,7 +16,8 @@ class ActorDto(db.Model):
     children: str = db.Column(db.Integer)
     debut_year: int = db.Column(db.Integer)
 
-    def __init__(self, actorId, name, age, real_name, spouse, children, debut_year):
+    def __init__(self, photo, actorId, name, age, real_name, spouse, children, debut_year):
+        self.photo = photo
         self.actorId = actorId
         self.name = name
         self.age = age
@@ -31,6 +36,7 @@ class ActorDto(db.Model):
     @property
     def json(self):
         return {
+            'photo' : self.photo,
             'actorId' : self.actorId,
             'name' : self.name,
             'age' : self.age,
@@ -47,3 +53,22 @@ class ActorDto(db.Model):
     def delete(self):
         db.session.delete(self)
         db.session.commit
+
+config = {
+    'user' : 'root',
+    'password' : 'root',
+    'host': '127.0.0.1',
+    'port' : '3306',
+    'database' : 'dayoungdb'
+}
+charset = {'utf8':'utf8'}
+url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
+engine = create_engine(url)
+service = ActorPro()
+Session = sessionmaker(bind=engine)
+s = Session()
+df = service.hook()
+print(df.head())
+s.bulk_insert_mappings(ActorDto, df.to_dict(orient="records"))
+s.commit()
+s.close()
