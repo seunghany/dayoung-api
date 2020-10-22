@@ -10,7 +10,7 @@ from com_dayoung_api.actor.api import Actor, Actors
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
 print('========== url ==========')
 print(url)
 app.config['SQLALCHEMY_DATABASE_URI'] = url

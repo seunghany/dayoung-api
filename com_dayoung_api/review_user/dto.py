@@ -1,16 +1,16 @@
 from com_dayoung_api.ext.db import db
 
-class ActorMovieDto(db.Model):
+class ReviewUserDto(db.Model):
 
     __tablename__ = 'Actor_Movie'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     userid: str = db.Column(db.String(30))
-    moveid: str = db.Column(db.String(30))
+    reviewid: str = db.Column(db.String(30))
 
-    def __init__(self, userid, movieid):
+    def __init__(self, userid, reviewid):
         self.userid = userid
-        self.moveid = movieid
+        self.reviewid = reviewid
 
     def __repr__(self):
         return f'User_Movie(id={self.id},userid={self.userid},\
@@ -20,7 +20,7 @@ class ActorMovieDto(db.Model):
     def json(self):
         return {
             'userid' : self.userid,
-            'moveid' : self.movieid
+            'reviewid' : self.reviewid
         }
 
     def save(self):

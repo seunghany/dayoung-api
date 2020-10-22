@@ -2,7 +2,7 @@
 from com_dayoung_api.ext.db import db
 
 
-class ActorMovieDao():
+class ReviewUserDao():
 
     @classmethod
     def find_all(cls):

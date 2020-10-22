@@ -7,15 +7,15 @@ class ActorDto(db.Model):
     __tablename__ = 'actors'
     __table_args__={'mysql_collate':'utf8_general_ci'}
     # columns=['photo_url', 'age','name','real_name','religion','agency', 'spouse', 'children','debut_year','actor_id']
-    actorid = str = db.Column(db.String(30), primary_key = True, index = True)
-    photo_url: str = db.Column(db.String(100))
+    actorid: str = db.Column(db.String(30), primary_key = True, index = True)
+    photo_url: str = db.Column(db.String(200))
     name: str = db.Column(db.String(30))
     age: str = db.Column(db.String(30))
     real_name: str = db.Column(db.String(30))
     religion: str = db.Column(db.String(30))
     agency: str = db.Column(db.String(30))
     spouse: str = db.Column(db.String(30))
-    children: str = db.Column(db.Integer)
+    children: str = db.Column(db.String(30))
     debut_year: int = db.Column(db.Integer)
 
     def __init__(self, photo_url, actorid, name, age, real_name, spouse, children, debut_year, agency, religion):
@@ -39,7 +39,7 @@ class ActorDto(db.Model):
     def json(self):
         return {
             'photo_url' : self.photo_url,
-            'actorId' : self.actorid,
+            'actorid' : self.actorid,
             'name' : self.name,
             'age' : self.age,
             'real_name' : self.real_name,
