@@ -6,29 +6,29 @@ from sqlalchemy import create_engine
 class ActorDto(db.Model):
     __tablename__ = 'actors'
     __table_args__={'mysql_collate':'utf8_general_ci'}
-    # columns=['photo_url', 'age','name','real_name','religion','agency', 'spouse', 'children','debut_year','actor_id']
+    # columns=['photoUrl', 'age','name','realName','religion','agency', 'spouse', 'children','debutYear','actorid']
     actorid: str = db.Column(db.String(30), primary_key = True, index = True)
-    photo_url: str = db.Column(db.String(200))
+    photoUrl: str = db.Column(db.String(200))
     name: str = db.Column(db.String(30))
     age: str = db.Column(db.String(30))
-    real_name: str = db.Column(db.String(30))
+    realName: str = db.Column(db.String(30))
     religion: str = db.Column(db.String(30))
     agency: str = db.Column(db.String(30))
     spouse: str = db.Column(db.String(30))
     children: str = db.Column(db.String(30))
-    debut_year: int = db.Column(db.Integer)
+    debutYear: int = db.Column(db.Integer)
 
-    def __init__(self, photo_url, actorid, name, age, real_name, spouse, children, debut_year, agency, religion):
-        self.photo_url = photo_url
+    def __init__(self, photoUrl, actorid, name, age, realName, spouse, children, debutYear, agency, religion):
+        self.photoUrl = photoUrl
         self.actorid = actorid
         self.name = name
         self.age = age
-        self.real_name = real_name
+        self.realName = realName
         self.religion = religion
         self.agency = agency
         self.spouse = spouse
         self.children = children
-        self.debut_year = debut_year
+        self.debutYear = debutYear
 
     # def __repr__(self):
     #     return f'Actors(id={self.id}, user={self.userid}, \
@@ -38,14 +38,14 @@ class ActorDto(db.Model):
     @property
     def json(self):
         return {
-            'photo_url' : self.photo_url,
+            'photoUrl' : self.photoUrl,
             'actorid' : self.actorid,
             'name' : self.name,
             'age' : self.age,
-            'real_name' : self.real_name,
+            'realName' : self.realName,
             'spouse' : self.spouse,
             'children' : self.children,
-            'debut_year' : self.debut_year,
+            'debutYear' : self.debutYear,
             'religion' : self.religion,
             'agency' : self.agency
         }

@@ -36,7 +36,7 @@ class Crawling:
                 tables = table.find_all("tr")
                 url_table = tables[1].find('a',attrs={"class":"image"})
                 url2 = url_table.find('img')['src']
-                actor_info['photo_url'] = url2
+                actor_info['photoUrl'] = url2
                 tables = tables[2:]
                 actor = {}
                 for table in tables:
@@ -55,9 +55,9 @@ class Crawling:
                 # 가명 없을 시 없다고 표시 본명에 가명 없음 이라고 표시
                 actor_info['name'] = name
                 if '본명' not in actor.keys():
-                    actor_info['real_name'] = 'no real name'
+                    actor_info['realName'] = 'no real name'
                 else:
-                    actor_info['real_name'] = actor['본명']
+                    actor_info['realName'] = actor['본명']
                 # 종교
                 if '종교' not in actor.keys():
                     actor_info['religion'] = 'no religion'
@@ -78,12 +78,12 @@ class Crawling:
                 # 활동 기간 - 정규식 이용
                 # 데뷔년도
                 p = re.compile('....년')
-                debut_year = p.findall(actor['활동 기간'])[0][:-1]
-                actor_info['debut_year'] = debut_year
+                debutYear = p.findall(actor['활동 기간'])[0][:-1]
+                actor_info['debutYear'] = debutYear
                 actors.append(actor_info)
 
             else:
                 print(name, "이름의 유명인이 많음으로 인해 제외 합니다")
-        data = DataFrame(actors, columns=['photo_url', 'age','name','real_name','religion','agency', 'spouse', 'children','debut_year','actorid'])
+        data = DataFrame(actors, columns=['photoUrl', 'age','name','realName','religion','agency', 'spouse', 'children','debutYear','actorid'])
         return data
 

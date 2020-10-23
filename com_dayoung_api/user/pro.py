@@ -13,7 +13,8 @@ class UserPro:
         return data
     def new_model(self) -> object:
         path = os.path.abspath("")
-        fname = r"\data\user.csv"
+        # \com_dayoung_api\
+        fname = r"user\data\user.csv"
         data = pd.read_csv(path + fname, encoding='utf-8')
         # print('***********')
         # data = data.head()

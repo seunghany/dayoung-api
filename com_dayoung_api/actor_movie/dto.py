@@ -2,7 +2,7 @@ from com_dayoung_api.ext.db import db
 
 class ActorMovieDto(db.Model):
 
-    __tablename__ = 'Actor_Movie'
+    __tablename__ = 'ActorMovie'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
     userid: str = db.Column(db.String(30))
