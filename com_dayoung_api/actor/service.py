@@ -1,6 +1,6 @@
 from com_dayoung_api.actor.crawling import Crawling
 
-class ActorPro:
+class ActorService:
     
     def __init__(self):
         
@@ -20,6 +20,6 @@ class ActorPro:
 
 if __name__ == '__main__':
     # actors_name =["수지", "이병헌","전지현","손예진","안소희","하지원","강동원","하정우","김혜수","현빈" ,"유해진","송강호"]
-    m = ActorPro()
+    m = ActorService()
     m.hook()
     

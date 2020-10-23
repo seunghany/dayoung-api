@@ -3,7 +3,7 @@ from com_dayoung_api.utils.file_helper import FileReader
 import pandas as pd
 from pathlib import Path
 
-class UserPro:
+class UserService:
     def __init__(self):
         self.fileReader = FileReader()  
         self.path = os.path.abspath("")
@@ -22,5 +22,5 @@ class UserPro:
         return data
 
 if __name__ == '__main__':
-    m = UserPro()
+    m = UserService()
     m.hook()

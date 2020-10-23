@@ -1,5 +1,5 @@
 from com_dayoung_api.ext.db import db
-from com_dayoung_api.actor.pro import ActorPro
+from com_dayoung_api.actor.service import ActorService
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
 
@@ -65,14 +65,14 @@ config = {
     'port' : '3306',
     'database' : 'dayoungdb'
 }
-charset = {'utf8':'utf8'}
-url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
-engine = create_engine(url)
-service = ActorPro()
-Session = sessionmaker(bind=engine)
-s = Session()
-df = service.hook()
-print(df.head())
-s.bulk_insert_mappings(ActorDto, df.to_dict(orient="records"))
-s.commit()
-s.close()
+# charset = {'utf8':'utf8'}
+# url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
+# engine = create_engine(url)
+# service = ActorPro()
+# Session = sessionmaker(bind=engine)
+# s = Session()
+# df = service.hook()
+# print(df.head())
+# s.bulk_insert_mappings(ActorDto, df.to_dict(orient="records"))
+# s.commit()
+# s.close()

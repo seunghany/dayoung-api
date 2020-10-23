@@ -1,5 +1,5 @@
 from com_dayoung_api.ext.db import db
-from com_dayoung_api.user.pro import UserPro
+from com_dayoung_api.user.service import UserService
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy import create_engine
 
@@ -53,10 +53,19 @@ config = {
     'port' : '3306',
     'database' : 'dayoungdb'
 }
+class UserVo:
+    userid: str = ''
+    password: str = ''
+    lname: str = ''
+    fname: str = ''
+    gender: str = 0
+    age: int = 0
+    email: str = ''
+
 # charset = {'utf8':'utf8'}
 # url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
 # engine = create_engine(url)
-# service = UserPro()
+# service = UserService()
 # Session = sessionmaker(bind=engine)
 # s = Session()
 # df = service.hook()
