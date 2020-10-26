@@ -65,6 +65,18 @@ config = {
     'port' : '3306',
     'database' : 'dayoungdb'
 }
+    # columns=['photoUrl', 'age','name','realName','religion','agency', 'spouse', 'children','debutYear','actorid']
+class ActorVo:
+    actorid: str = ''
+    photoUrl: str = ''
+    age: str = ''
+    name: str = ''
+    realName: str = ''
+    religion: str = ''
+    agency: str = ''
+    spouse: str = ''
+    children: str = ''
+    debutYear: int = 0
 # charset = {'utf8':'utf8'}
 # url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
 # engine = create_engine(url)
