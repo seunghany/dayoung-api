@@ -7,14 +7,22 @@ class UserService:
     def __init__(self):
         self.fileReader = FileReader()  
         self.path = os.path.abspath("")
+        self.odf = None
     def hook(self):
         data = self.new_model()
+        # self.odf = pd.DataFrame(
+        #     {
+        #         'userid' : '1',
+        #         'password' : '1',
+        #         'name' : 'steve'
+        #     }
+        # )
         print(data)
         return data
     def new_model(self) -> object:
         path = os.path.abspath("")
         # \com_dayoung_api\
-        fname = r"user\data\user.csv"
+        fname = r"\data\user.csv"
         data = pd.read_csv(path + fname, encoding='utf-8')
         # print('***********')
         # data = data.head()

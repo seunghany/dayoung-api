@@ -10,11 +10,12 @@ class Actor(Resource):
         parser.add_argument('store_id', type=int, required=True, help='Must enter the store id')
         self.dao = ActorDao
 
-    def get(self, name):
-        item = self.dao.find_by_name(name)
-        if item:
-            return item.json()
-        return {'message': 'Item not found'}, 404
+    def get(self):
+        pass
+        # item = self.dao.find_by_name(name)
+        # if item:
+        #     return item.json()
+        # return {'message': 'Item not found'}, 404
 
 class Actors(Resource):
     def get(self):

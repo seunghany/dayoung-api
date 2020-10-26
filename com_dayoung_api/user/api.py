@@ -7,15 +7,21 @@ from flask import jsonify
 from flask import request
 
 parser = reqparse.RequestParser() # only allow price changes, no name changes allowed
-parser.add_argument('price', type=float, required=True, help='This field cannot be left blank')
-parser.add_argument('store_id', type=int, required=True, help='Must enter the store id')
+parser.add_argument('userid', type=str, required=True,
+                                        help='This field should be a userid')
+parser.add_argument('password', type=str, required=True,
+                                        help='This field should be a password')
 
 class User(Resource):
-    # def __init__(self):
-        
-    #     self.dao = UserDao
+    def __init__(self):
+        print("지금 user api 들어옴!!!!!")
+        print()    
+        print()    
+        print()    
+         
     @ staticmethod
     def post():
+        print('Post entered')
         args = parser.parse_args()
         print(f'User {args["id"]} added ')
         params = json.loads(request.get_data(), encoding='utf-8')
@@ -53,11 +59,14 @@ class User(Resource):
 class Users(Resource):
     
     def post(self):
+        print("post 들어옴")
         ud = UserDao()
         ud.insert_many('users')
 
-    def get():
-        ...
+    def get(self):
+        print('========== 10 ==========')
+        data = UserDao.find_all()
+        return data, 200
 
 class Auth(Resource):
     
@@ -76,8 +85,10 @@ class Access(Resource):
         print("========5 user/api.py Access")
     def post(self):
         print("========6 user/api.py post")
-        args = parser.parse_args()
+        args = parser.parse_args() # 이걸 몰겠음
+        print('---------------------------------7---------------------')
         user = UserVo()
+        print('8 ---------------------------')
         user.userid = args.userid
         user.password = args.password
         print(user.userid)
