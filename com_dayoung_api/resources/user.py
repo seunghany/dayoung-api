@@ -178,8 +178,8 @@ class User(Resource):
             params_str += 'key: {}, value: {}<br>'.format(key, params[key])
         return {'code':0, 'message': 'SUCCESS'}, 200
     @staticmethod
-    def get(id):
-        print(f'User {id} added ')
+    def get(id: str):
+        print(f'::::::::::::: User {id} added ')
         try:
             user = UserDao.find_by_id(id)
             if user:
