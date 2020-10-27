@@ -13,24 +13,46 @@ import numpy as np
 from sqlalchemy import func
 from pathlib import Path
 
+class UserPreprocess(object):
+    def __init__(self):
+        self.fileReader = FileReader()  
+        self.path = os.path.abspath("")
+    def hook(self):
+        data = self.new_model()
+        print(data)
+        return data
+    def new_model(self) -> object:
+        path = os.path.abspath("")
+        # \com_dayoung_api\
+        fname = r"\com_dayoung_api\resources\data\user.csv"
+        data = pd.read_csv(path + fname, encoding='utf-8')
+        # print('***********')
+        # data = data.head()
+        # print(data)
+        return data
+
+# if __name__ == '__main__':
+#     m = UserPreprocess()
+#     m.hook()
+
 class UserDto(db.Model):
     __tablename__ = 'users'
     __table_args__={'mysql_collate':'utf8_general_ci'}
 
-    userid: str = db.Column(db.String(30), primary_key = True, index = True)
+    user_id: str = db.Column(db.String(30), primary_key = True, index = True)
     password: str = db.Column(db.String(30))
+    fname: str = db.Column(db.String(30))
     lname: str = db.Column(db.String(30))
     age: int = db.Column(db.Integer)
-    fname: str = db.Column(db.String(30))
     gender: str = db.Column(db.String(30))
     email: str = db.Column(db.String(60))
 
-    def __init__(self, userid, password, lname, age, fname, gender,email):
-        self.userid = userid
+    def __init__(self, user_id, password,fname, lname, age, gender,email):
+        self.user_id = user_id
         self.password = password
+        self.fname = fname
         self.lname = lname
         self.age = age
-        self.fname = fname
         self.gender = gender
         self.email = email
 
@@ -39,7 +61,7 @@ class UserDto(db.Model):
     @property
     def json(self):
         return {
-            'userid' : self.userid,
+            'user_id' : self.user_id,
             'password' : self.password,
             'lname' : self.lname,
             'age' : self.age,
@@ -49,7 +71,7 @@ class UserDto(db.Model):
         }
 
 class UserVo:
-    userid: str = ''
+    user_id: str = ''
     password: str = ''
     lname: str = ''
     fname: str = ''
@@ -57,11 +79,39 @@ class UserVo:
     age: int = 0
     email: str = ''
 
+Session = openSession()
+session = Session()
+user_preprocess = UserPreprocess()
+
 class UserDao(UserDto):
+    @staticmethod   
+    def bulk():
+        df = user_preprocess.hook()
+        print(df.head())
+        session.bulk_insert_mappings(UserDto, df.to_dict(orient="records"))
+        session.commit()
+        session.close()
+
+    @staticmethod
+    def count():
+        return session.query(func.count(UserDto.user_id)).one()
+
+    @staticmethod
+    def save(user):
+        db.session.add(user)
+        db.session.commit()
+
+    @staticmethod
+    def update(user):
+        db.session.add(user)
+        db.session.commit()
+
     @classmethod
-    def count(cls):
-        return cls.query.count()
-    
+    def delete(cls,id):
+        data = cls.query.get(id)
+        db.session.delete(data)
+        db.session.commit()
+
     @classmethod
     def find_all(cls):
         sql = cls.query
@@ -73,77 +123,33 @@ class UserDao(UserDto):
         return cls.query.filer_by(name == name)
 
     @classmethod
-    def find_by_id(cls, userid):
-        return cls.query.filter_by(userid == userid)
+    def find_by_id(cls, user_id):
+        return cls.query.filter_by(user_id == user_id)
 
 
     @classmethod
     def login(cls, user):
         sql = cls.query\
-            .filter(cls.userid.like(user.userid))\
+            .filter(cls.user_id.like(user.user_id))\
             .filter(cls.password.like(user.password))
         df = pd.read_sql(sql.statement, sql.session.bind)
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
             
 
-    @staticmethod
-    def save(user):
-        db.session.add(user)
-        db.session.commit()
 
-    @staticmethod   
-    def insert_many():
-        service = UserService()
-        Session = openSession()
-        session = Session()
-        df = service.hook()
-        print(df.head())
-        session.bulk_insert_mappings(UserDto, df.to_dict(orient="records"))
-        session.commit()
-        session.close()
-
-    @staticmethod
-    def modify_user(user):
-        db.session.add(user)
-        db.session.commit()
-
-    @classmethod
-    def delete_user(cls,id):
-        data = cls.query.get(id)
-        db.session.delete(data)
-        db.session.commit()
+if __name__ == "__main__":
+    UserDao.bulk()
         
 """   
 # ==============================================================
 # ==============================================================
-# ====================     Service  ============================
+# ====================     Preprocess  ============================
 # ==============================================================
 # ==============================================================
 """
 
-class UserService:
-    def __init__(self):
-        self.fileReader = FileReader()  
-        self.path = os.path.abspath("")
-        self.odf = None
-    def hook(self):
-        data = self.new_model()
-        print(data)
-        return data
-    def new_model(self) -> object:
-        path = os.path.abspath("")
-        # \com_dayoung_api\
-        fname = r"\data\user.csv"
-        data = pd.read_csv(path + fname, encoding='utf-8')
-        # print('***********')
-        # data = data.head()
-        # print(data)
-        return data
 
-if __name__ == '__main__':
-    m = UserService()
-    m.hook()
 
 # ==============================================================
 # ==============================================================
@@ -152,8 +158,8 @@ if __name__ == '__main__':
 # ==============================================================
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-parser.add_argument('userid', type=str, required=True,
-                                        help='This field should be a userid')
+parser.add_argument('user_id', type=str, required=True,
+                                        help='This field should be a user_id')
 parser.add_argument('password', type=str, required=True,
                                         help='This field should be a password')
 
@@ -194,34 +200,34 @@ class User(Resource):
         return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
 class Users(Resource):
-    
-    def post(self):
+    @staticmethod
+    def post():
         ud = UserDao()
-        ud.insert_many('users')
-
-    def get(self):
+        ud.bulk('users')
+    @staticmethod
+    def get():
         data = UserDao.find_all()
         return data, 200
 
 class Auth(Resource):
-
-    def post(self):
+    @staticmethod
+    def post():
         body = request.get_json()
         user = UserDto(**body)
         UserDao.save(user)
-        id = user.userid
+        id = user.user_id
         
         return {'id': str(id)}, 200 
 
 
 class Access(Resource):
-    
-    def post(self):
+    @staticmethod
+    def post():
         args = parser.parse_args()
         user = UserVo()
-        user.userid = args.userid
+        user.user_id = args.user_id
         user.password = args.password
-        print(user.userid)
+        print(user.user_id)
         print(user.password)
         data = UserDao.login(user)
         return data[0], 200

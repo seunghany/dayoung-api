@@ -1,4 +1,4 @@
-﻿userid,password,fname,age,lname,gender,email
+﻿user_id,password,fname,age,lname,gender,email
 1,1,Serafina,34.87,Bumgarner,F,serafina.bumgarner@exxonmobil.com
 2,1,Juliette,50.26,Rojo,F,juliette.rojo@yahoo.co.uk
 3,1,Milan,37.34,Krawczyk,M,milan.krawczyk@hotmail.com
