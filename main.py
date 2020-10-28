@@ -6,10 +6,8 @@ from com_dayoung_api.resources.user import UserDao
 from com_dayoung_api.resources.actor import ActorDao
 from flask_cors import CORS
 
-
-
 app = Flask(__name__)
-CORS(app, resources={r'/api/*': {"origins": "*"}})
+CORS(app, resources={r'/api/*': {"origins": "*"}}) # api open subdomain
 
 app.config['SQLALCHEMY_DATABASE_URI'] = url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False

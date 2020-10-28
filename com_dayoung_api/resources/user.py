@@ -3,7 +3,7 @@ from flask import request
 from flask_restful import Resource, reqparse
 import json
 from flask import jsonify
-from com_dayoung_api.ext.db import db, openSession
+from com_dayoung_api.ext.db import db, openSession # db 선택 Dayoungdb 에서
 import pandas as pd
 import json
 import os
@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import func
 from pathlib import Path
+from sqlalchemy.ext.hybrid import hybrid_property
 
 class UserPreprocess(object):
     def __init__(self):
@@ -35,17 +36,19 @@ class UserPreprocess(object):
 #     m = UserPreprocess()
 #     m.hook()
 
-class UserDto(db.Model):
-    __tablename__ = 'users'
+class UserDto(db.Model): # 여기서 DB 모델 만든 것
+    __tablename__ = 'users' # 테이블 이름
     __table_args__={'mysql_collate':'utf8_general_ci'}
+    # The __table_args__ attribute allows passing extra arguments to that Table
 
-    user_id: str = db.Column(db.String(30), primary_key = True, index = True)
+    # Creates table columns
+    user_id: str = db.Column(db.String(30), primary_key = True, index = True) 
     password: str = db.Column(db.String(30))
     fname: str = db.Column(db.String(30))
     lname: str = db.Column(db.String(30))
     age: int = db.Column(db.Integer)
     gender: str = db.Column(db.String(30))
-    email: str = db.Column(db.String(60))
+    email: str = db.Column(db.String(80), unique=True)
 
     def __init__(self, user_id, password,fname, lname, age, gender,email):
         self.user_id = user_id
@@ -56,7 +59,16 @@ class UserDto(db.Model):
         self.gender = gender
         self.email = email
 
-
+    @hybrid_property
+    def fullname(self):
+        if self.firstname is not None:
+            return self.firstname + " " + self.lastname
+        else:
+            return self.lastname
+    # some_user = session.query(User).first()
+    # print(some_user.fullname)
+    # as well as usable within queries: 
+    # some_user = session.query(User).filter(User.fullname == "John Smith").first()
 
     @property
     def json(self):
@@ -75,7 +87,7 @@ class UserVo:
     password: str = ''
     lname: str = ''
     fname: str = ''
-    gender: str = 0
+    gender: str = ''
     age: int = 0
     email: str = ''
 
@@ -97,12 +109,12 @@ class UserDao(UserDto):
         return session.query(func.count(UserDto.user_id)).one()
 
     @staticmethod
-    def save(user):
+    def update(user):
         db.session.add(user)
         db.session.commit()
 
     @staticmethod
-    def update(user):
+    def register(user):
         db.session.add(user)
         db.session.commit()
 
@@ -118,24 +130,39 @@ class UserDao(UserDto):
         df = pd.read_sql(sql.statement, sql.session.bind)
         return json.loads(df.to_json(orient='records'))
 
+    '''
+    SELECT *
+    FROM users
+    WHERE user_name LIKE 'name'
+    '''
+    # the meaning of the symbol %
+    # A% ==> Apple
+    # %A ==> NA
+    # %A% ==> Apple, NA, BAG 
     @classmethod
     def find_by_name(cls, name):
-        return cls.query.filer_by(name == name)
+        return session.query(UserDto).filter(UserDto.user_id.like(f'%{name}%'))
 
+    '''
+    SELECT *
+    FROM users
+    WHERE user_name LIKE 'a'
+    '''
+    # like() method itself produces the LIKE criteria 
+    # for WHERE clause in the SELECT expression.
     @classmethod
     def find_by_id(cls, user_id):
-        return cls.query.filter_by(user_id == user_id)
-
+        return session.query(UserDto).filter(UserDto.user_id.like(user_id))
 
     @classmethod
     def login(cls, user):
+        print("----------------login")
         sql = cls.query\
             .filter(cls.user_id.like(user.user_id))\
             .filter(cls.password.like(user.password))
         df = pd.read_sql(sql.statement, sql.session.bind)
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
-            
 
 
 if __name__ == "__main__":
@@ -162,8 +189,20 @@ parser.add_argument('user_id', type=str, required=True,
                                         help='This field should be a user_id')
 parser.add_argument('password', type=str, required=True,
                                         help='This field should be a password')
+parser.add_argument('gender', type=str, required=True,
+                                        help='This field should be a gender')
+parser.add_argument('email', type=str, required=True,
+                                        help='This field should be a email')
+parser.add_argument('fname', type=str, required=True,
+                                        help='This field should be a fname')
+parser.add_argument('lname', type=str, required=True,
+                                        help='This field should be a lname')
+parser.add_argument('age', type=int, required=True,
+                                        help='This field should be a age')
+                                        
 
 class User(Resource):
+
     @staticmethod
     def post():
         args = parser.parse_args()
@@ -177,14 +216,19 @@ class User(Resource):
         for key in params.keys():
             params_str += 'key: {}, value: {}<br>'.format(key, params[key])
         return {'code':0, 'message': 'SUCCESS'}, 200
+
+    
     @staticmethod
     def get(id: str):
         print(f'::::::::::::: User {id} added ')
         try:
+            print('hello')
             user = UserDao.find_by_id(id)
+            print(user)
             if user:
                 return user.json()
         except Exception as e:
+            print('failed')
             return {'message': 'User not found'}, 404
 
     @staticmethod
@@ -196,7 +240,7 @@ class User(Resource):
     @staticmethod
     def delete():
         args = parser.parse_args()
-        print(f'USer {args["id"]} deleted')
+        print(f'Us er {args["id"]} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
 class Users(Resource):
@@ -210,24 +254,40 @@ class Users(Resource):
         return data, 200
 
 class Auth(Resource):
+
     @staticmethod
     def post():
-        body = request.get_json()
-        user = UserDto(**body)
-        UserDao.save(user)
-        id = user.user_id
-        
-        return {'id': str(id)}, 200 
+        print("------------------여기는 user.py Auth ------------------- ")
+        args = parser.parse_args()
+        print(args)
+        user = UserVo()
+        user.user_id = args.user_id
+        user.password = args.password
+        user.lname = args.lname
+        user.fname = args.fname
+        user.gender = args.gender
+        user.email = args.email
+        user.age = args.age
+
+        print("아이디: ", user.user_id)
+        print("비밀번호: ", user.password)
+        print("이메일 :", user.email )
+        data = UserDao.register(user)
+        return data[0], 200
 
 
 class Access(Resource):
     @staticmethod
     def post():
+        print('---------------------3---------------------')
         args = parser.parse_args()
+        print("-------------------444444")
+        print(args)
         user = UserVo()
         user.user_id = args.user_id
         user.password = args.password
-        print(user.user_id)
-        print(user.password)
+        
+        print("아이디: ", user.user_id)
+        print("비밀번호: ", user.password)
         data = UserDao.login(user)
         return data[0], 200

@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 db = SQLAlchemy()
-
 config = {
     'user' : 'root',
     'password' : 'root',
@@ -15,7 +14,8 @@ charset = {'utf8':'utf8'}
 url = f"mysql+mysqlconnector://{config['user']}:{config['password']}@{config['host']}:{config['port']}/{config['database']}?charset=utf8"
 Base = declarative_base()
 engine = create_engine(url)
-
+# the declarative_base() callable returns a new base class from which all mapped classes should inherit.
+#  When the class definition is completed, a new Table and mapper() will have been generated.
 
 def openSession():
     return sessionmaker(bind=engine)

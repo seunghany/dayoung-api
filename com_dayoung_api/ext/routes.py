@@ -18,6 +18,10 @@ auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 access = Blueprint('access', __name__, url_prefix='/api/access')
 actor = Blueprint('actor', __name__, url_prefix='/api/actor')
 actors = Blueprint('actors', __name__, url_prefix='/api/actors')
+print("hello world----------------------------")
+
+
+# resful api 읽기
 
 api = Api(home)
 api = Api(user)
@@ -26,7 +30,7 @@ api = Api(auth)
 api = Api(access)
 api = Api(actor)
 api = Api(actors)
-
+print("-----------------------------api")
 def initialize_routes(api):
     print("================ 2 route ====================")
     api.add_resource(Home, '/api')
@@ -34,12 +38,13 @@ def initialize_routes(api):
     # api.add_resource(Movies, '/Movies')
     # api.add_resource(Review, '/Review<string:id>')
     # api.add_resource(Reviews, '/Reviews')
-    api.add_resource(User, '/api/user<string:id>')
+    api.add_resource(User, '/api/user/<string:id>')
     api.add_resource(Users, '/api/users')
     api.add_resource(Auth, '/api/auth')
     api.add_resource(Access, '/api/access')
-    api.add_resource(Actor, '/api/actor<string:id>')
+    api.add_resource(Actor, '/api/actor/<string:id>')
     api.add_resource(Actors, '/api/actors')
+
     
     
 @user.errorhandler(500)
