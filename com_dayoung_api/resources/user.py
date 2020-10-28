@@ -115,7 +115,11 @@ class UserDao(UserDto):
 
     @staticmethod
     def register(user):
+        Session = openSession()
+        session = Session()
+        print('I am at Register!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         db.session.add(user)
+        print('I am at adddddddddddddddddddddddddddddd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         db.session.commit()
 
     @classmethod
@@ -152,7 +156,7 @@ class UserDao(UserDto):
     # for WHERE clause in the SELECT expression.
     @classmethod
     def find_by_id(cls, user_id):
-        return session.query(UserDto).filter(UserDto.user_id.like(user_id))
+        return session.query(UserDto).filter(UserDto.user_id.like(f'{user_id}')).one()
 
     @classmethod
     def login(cls, user):
@@ -184,27 +188,18 @@ if __name__ == "__main__":
 # ==============================================================
 # ==============================================================
 
-parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-parser.add_argument('user_id', type=str, required=True,
-                                        help='This field should be a user_id')
-parser.add_argument('password', type=str, required=True,
-                                        help='This field should be a password')
-parser.add_argument('gender', type=str, required=True,
-                                        help='This field should be a gender')
-parser.add_argument('email', type=str, required=True,
-                                        help='This field should be a email')
-parser.add_argument('fname', type=str, required=True,
-                                        help='This field should be a fname')
-parser.add_argument('lname', type=str, required=True,
-                                        help='This field should be a lname')
-parser.add_argument('age', type=int, required=True,
-                                        help='This field should be a age')
+
                                         
 
 class User(Resource):
 
     @staticmethod
     def post():
+        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        parser.add_argument('user_id', type=str, required=True,
+                                                help='This field should be a user_id')
+        parser.add_argument('password', type=str, required=True,
+                                                help='This field should be a password')
         args = parser.parse_args()
         print(f'User {args["id"]} added ')
         params = json.loads(request.get_data(), encoding='utf-8')
@@ -224,24 +219,28 @@ class User(Resource):
         try:
             print('hello')
             user = UserDao.find_by_id(id)
-            print(user)
+            print("---------------------------------------------")
+            print("User type", type(user))
+            print("User :", user)
+            print("User id:", user['user_id'])
+
             if user:
                 return user.json()
         except Exception as e:
             print('failed')
             return {'message': 'User not found'}, 404
 
-    @staticmethod
-    def update():
-        args = parser.parse_args()
-        print(f'User {args["id"]} updated ')
-        return {'code':0, 'message': 'SUCCESS'}, 200
+    # @staticmethod
+    # def update():
+    #     args = parser.parse_args()
+    #     print(f'User {args["id"]} updated ')
+    #     return {'code':0, 'message': 'SUCCESS'}, 200
 
-    @staticmethod
-    def delete():
-        args = parser.parse_args()
-        print(f'Us er {args["id"]} deleted')
-        return {'code' : 0, 'message' : 'SUCCESS'}, 200    
+    # @staticmethod
+    # def delete():
+    #     args = parser.parse_args()
+    #     print(f'Us er {args["id"]} deleted')
+    #     return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
 class Users(Resource):
     @staticmethod
@@ -254,33 +253,55 @@ class Users(Resource):
         return data, 200
 
 class Auth(Resource):
-
+    # self, user_id, password,fname, lname, age, gender,email
     @staticmethod
     def post():
         print("------------------여기는 user.py Auth ------------------- ")
+        
+        
+       
+        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        parser.add_argument('user_id', type=str, required=True,
+                                                help='This field should be a user_id')
+        parser.add_argument('password', type=str, required=True,
+                                                help='This field should be a password')
+        parser.add_argument('gender', type=str, required=True,
+                                                help='This field should be a gender')
+        parser.add_argument('email', type=str, required=True,
+                                                help='This field should be a email')
+        parser.add_argument('lname', type=str, required=True,
+                                                help='This field should be a lname')
+        parser.add_argument('fname', type=str, required=True,
+                                                help='This field should be a fname')
+        parser.add_argument('age', type=int, required=True,
+                                        help='This field should be a age')
         args = parser.parse_args()
-        print(args)
-        user = UserVo()
-        user.user_id = args.user_id
-        user.password = args.password
-        user.lname = args.lname
-        user.fname = args.fname
-        user.gender = args.gender
-        user.email = args.email
-        user.age = args.age
+        user = UserDto(args.user_id,args.password,args.fname,args.lname,args.age,args.gender,args.email)
 
         print("아이디: ", user.user_id)
         print("비밀번호: ", user.password)
         print("이메일 :", user.email )
+        print("성 :", user.lname)
+        print("이름 :", user.fname)
+        print("나이 :", user.age)
+        print("성별 :", user.gender)
+        
         data = UserDao.register(user)
-        return data[0], 200
+        return "worked"
 
 
 class Access(Resource):
     @staticmethod
     def post():
         print('---------------------3---------------------')
+        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        parser.add_argument('user_id', type=str, required=True,
+                                                help='This field should be a user_id')
+        parser.add_argument('password', type=str, required=True,
+                                                help='This field should be a password')
+
         args = parser.parse_args()
+
         print("-------------------444444")
         print(args)
         user = UserVo()

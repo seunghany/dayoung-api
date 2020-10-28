@@ -30,7 +30,7 @@ api = Api(auth)
 api = Api(access)
 api = Api(actor)
 api = Api(actors)
-print("-----------------------------api")
+
 def initialize_routes(api):
     print("================ 2 route ====================")
     api.add_resource(Home, '/api')
