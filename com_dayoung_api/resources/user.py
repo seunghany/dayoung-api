@@ -169,7 +169,7 @@ class UserDao(UserDto):
         sql = cls.query\
             .filter(cls.user_id.like(user.user_id))\
             .filter(cls.password.like(user.password))
-        print(type(sql))
+        print("login type ",type(sql))
         df = pd.read_sql(sql.statement, sql.session.bind)
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
@@ -225,8 +225,12 @@ class User(Resource):
         try:
             print('hello')
             user = UserDao.find_by_id(id)
-            data = [user.json()]
+            print(user)
+            data = user.json()
+            # data = json.dumps(data)
+            print(data)
             print(type(data))
+            print('위에다==================')
             return data, 200
         except Exception as e:
             print('failed')
@@ -252,7 +256,7 @@ class Users(Resource):
     @staticmethod
     def get():
         data = UserDao.find_all()
-        print(type(data))
+        print("list : ",type(data))
         return data, 200
 
 class Auth(Resource):
