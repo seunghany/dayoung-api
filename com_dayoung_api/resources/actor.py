@@ -58,7 +58,6 @@ class ActorDto(db.Model):
         self.children = children
         self.debut_year = debut_year
 
-    @property
     def json(self):
         return {
             'photo_url' : self.photo_url,
@@ -198,7 +197,7 @@ class ActorDao(ActorDto):
 
     @classmethod
     def find_by_id(cls, actor_id):
-        return cls.query.filter_by(actor_id == actor_id)
+        return session.query(ActorDto).filter(ActorDto.actor_id.like(f'{actor_id}')).one()
 
 
     @classmethod
@@ -250,12 +249,13 @@ class Actor(Resource):
             params_str += 'key: {}, value: {}<br>'.format(key, params[key])
         return {'code':0, 'message': 'SUCCESS'}, 200
     @staticmethod
-    def get(id):
+    def get(id: str):
         print(f'Actor {id} added ')
         try:
             actor = ActorDao.find_by_id(id)
-            if actor:
-                return actor.json()
+            data = actor.json()
+            
+            return data, 200
         except Exception as e:
             return {'message': 'Actor not found'}, 404
 

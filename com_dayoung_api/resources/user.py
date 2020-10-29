@@ -223,14 +223,8 @@ class User(Resource):
     def get(id: str):
         print(f'::::::::::::: User {id} added ')
         try:
-            print('hello')
             user = UserDao.find_by_id(id)
-            print(user)
             data = user.json()
-            # data = json.dumps(data)
-            print(data)
-            print(type(data))
-            print('위에다==================')
             return data, 200
         except Exception as e:
             print('failed')
