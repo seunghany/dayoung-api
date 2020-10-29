@@ -61,16 +61,16 @@ class UserDto(db.Model): # 여기서 DB 모델 만든 것
 
     @hybrid_property
     def fullname(self):
-        if self.firstname is not None:
-            return self.firstname + " " + self.lastname
+        
+        if self.fname is not None:
+            return self.fname + " " + self.lname
         else:
-            return self.lastname
+            return self.lname
     # some_user = session.query(User).first()
-    # print(some_user.fullname)
+    # print(s()ome_user.fullname)
     # as well as usable within queries: 
-    # some_user = session.query(User).filter(User.fullname == "John Smith").first()
-
-    @property
+    # some_user = session.query(User).filter(User.fullname == "John Smith").first
+    
     def json(self):
         return {
             'user_id' : self.user_id,
@@ -81,6 +81,11 @@ class UserDto(db.Model): # 여기서 DB 모델 만든 것
             'gender': self.gender,
             'email': self.email
         }
+        
+        
+
+    def __str__(self):
+         return self.user_id
 
 class UserVo:
     user_id: str = ''
@@ -145,7 +150,7 @@ class UserDao(UserDto):
     # %A% ==> Apple, NA, BAG 
     @classmethod
     def find_by_name(cls, name):
-        return session.query(UserDto).filter(UserDto.user_id.like(f'%{name}%'))
+        return session.query(UserDto).filter(UserDto.fname.like(f'%{name}%'))
 
     '''
     SELECT *
@@ -164,6 +169,7 @@ class UserDao(UserDto):
         sql = cls.query\
             .filter(cls.user_id.like(user.user_id))\
             .filter(cls.password.like(user.password))
+        print(type(sql))
         df = pd.read_sql(sql.statement, sql.session.bind)
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
@@ -219,13 +225,9 @@ class User(Resource):
         try:
             print('hello')
             user = UserDao.find_by_id(id)
-            print("---------------------------------------------")
-            print("User type", type(user))
-            print("User :", user)
-            print("User id:", user['user_id'])
-
-            if user:
-                return user.json()
+            data = [user.json()]
+            print(type(data))
+            return data, 200
         except Exception as e:
             print('failed')
             return {'message': 'User not found'}, 404
@@ -250,6 +252,7 @@ class Users(Resource):
     @staticmethod
     def get():
         data = UserDao.find_all()
+        print(type(data))
         return data, 200
 
 class Auth(Resource):
