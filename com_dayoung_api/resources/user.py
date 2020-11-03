@@ -151,9 +151,7 @@ class UserDao(UserDto):
     @classmethod
     def delete(cls,id):
         data = cls.query.get(id)
-        print(data)
         db.session.delete(data)
-        print("helo")
         db.session.commit()
         session.close()
         

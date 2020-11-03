@@ -88,55 +88,7 @@ class ActorVo:
 Session = openSession()
 session = Session()
 actor_preprocess = ActorPreprocess()
-
-
-class ActorDao(ActorDto):
-
-    @classmethod
-    def count(cls):
-        return cls.query.count()
-
-    @classmethod
-    def find_all(cls):
-        sql = cls.query
-        df = pd.read_sql(sql.statement, sql.session.bind)
-        return json.loads(df.to_json(orient='records'))
-
-    @classmethod
-    def find_by_name(cls, name):
-        return cls.query.filer_by(name == name)
-
-    @classmethod
-    def find_by_id(cls, actor_id):
-        return cls.query.filter_by(actor_id == actor_id)
-
-
-    @staticmethod
-    def save(actor):
-        db.session.add(actor)
-        db.session.commit()
-
-    @staticmethod   
-    def insert_many():
-        preprocess = ActorPreprocess()
-        Session = openSession()
-        session = Session()
-        df = preprocess.hook()
-        print(df.head())
-        session.bulk_insert_mappings(ActorDto, df.to_dict(orient="records"))
-        session.commit()
-        session.close()
-
-    @staticmethod
-    def modify_actor(actor):
-        db.session.add(actor)
-        db.session.commit()
-
-    @classmethod
-    def delete_actor(cls,id):
-        data = cls.query.get(id)
-        db.session.delete(data)
-        db.session.commit()
+    
     
 """   
 # ==============================================================
@@ -212,7 +164,13 @@ class ActorDao(ActorDto):
         df = pd.read_sql(sql.statement, sql.session.bind)
         print(json.loads(df.to_json(orient='records')))
         return json.loads(df.to_json(orient='records'))
-            
+
+    @classmethod
+    def delete_actor(cls,id):
+        data = cls.query.get(id)
+        db.session.delete(data)
+        db.session.commit()
+        session.close()
 
 
 if __name__ == "__main__":
@@ -266,9 +224,13 @@ class Actor(Resource):
         return {'code':0, 'message': 'SUCCESS'}, 200
 
     @staticmethod
-    def delete():
-        args = parser.parse_args()
-        print(f'Actor {args["id"]} deleted')
+    def delete(id):
+        print("-------------------------------")
+        print("-------------------------------")
+        print("-------------------------------")
+        print("-------------------------------")
+        ActorDao.delete_actor(id)
+        print(f'Actor {id} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
 class Actors(Resource):
