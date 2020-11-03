@@ -32,6 +32,7 @@ class Crawling:
             table = soup.find('table', attrs = {"class":"infobox"})
             actor_info = {}
             # if table.has_next
+            print("여기까진 옴")
             if table:
                 tables = table.find_all("tr")
                 url_table = tables[1].find('a',attrs={"class":"image"})
@@ -51,7 +52,6 @@ class Crawling:
                 actor_info['age'] = age
                 actor_info['actor_id'] = actor_id
                 actor_id +=1
-                
                 # 가명 없을 시 없다고 표시 본명에 가명 없음 이라고 표시
                 actor_info['name'] = name
                 if '본명' not in actor.keys():
@@ -64,7 +64,10 @@ class Crawling:
                 else:
                     actor_info['religion'] = actor['종교']
                 # 소속사는 다 있음
-                actor_info['agency'] = actor['소속사']
+                if '소속사' not in actor.keys():
+                    actor_info['agency'] = '소속사 없음'
+                else:
+                    actor_info['agency'] = actor['소속사']
                 # 배우자
                 if '배우자' not in actor.keys():
                     actor_info['spouse'] = 'no spouse'
@@ -81,9 +84,9 @@ class Crawling:
                 debut_year = p.findall(actor['활동 기간'])[0][:-1]
                 actor_info['debut_year'] = debut_year
                 actors.append(actor_info)
-
             else:
                 print(name, "이름의 유명인이 많음으로 인해 제외 합니다")
         data = DataFrame(actors, columns=['photo_url', 'age','name','real_name','religion','agency', 'spouse', 'children','debut_year','actor_id'])
+        print(data)
         return data
 

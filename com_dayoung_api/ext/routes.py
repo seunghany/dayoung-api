@@ -8,7 +8,7 @@ from flask_restful import Api
 
 from com_dayoung_api.resources.home import Home
 from com_dayoung_api.resources.user import User, Users, Auth, Access, Delete
-from com_dayoung_api.resources.actor import Actor, Actors
+from com_dayoung_api.resources.actor import Actor, Actors, AddActor
 # from com_dayoung_api.resources.movie import Movie
 
 # from com_dayoung_api.actor.api import Actor, Actors
@@ -22,6 +22,7 @@ actor = Blueprint('actor', __name__, url_prefix='/api/actor')
 actors = Blueprint('actors', __name__, url_prefix='/api/actors')
 movie = Blueprint('movie', __name__, url_prefix='/api/movie')
 delete = Blueprint('delete', __name__, url_prefix='/api/delete')
+addActor = Blueprint('addActor', __name__, url_prefix='/api/addActor')
 
 print("hello world----------------------------")
 
@@ -37,6 +38,7 @@ api = Api(actor)
 api = Api(actors)
 api = Api(movie)
 api = Api(delete)
+api = Api(addActor)
 
 def initialize_routes(api):
     print("================ 2 route ====================")
@@ -50,6 +52,7 @@ def initialize_routes(api):
     api.add_resource(Auth, '/api/auth')
     api.add_resource(Access, '/api/access')
     api.add_resource(Actor, '/api/actor/<string:id>')
+    api.add_resource(AddActor, '/api/addActor/<string:name>')
     api.add_resource(Delete, '/api/delete/<string:id>')
     api.add_resource(Actors, '/api/actors')
 

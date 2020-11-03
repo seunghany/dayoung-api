@@ -114,6 +114,19 @@ parser.add_argument('actor_id', type=str, required=True,
 class ActorDao(ActorDto):
     
     @staticmethod   
+    def add (actor_name):
+        crawl = Crawling([actor_name])
+        print("여기 있음")
+        df = crawl.crawl()
+        print(df)
+        actor = ActorDto(df.to_dict(orient="records"))
+        print(actor)
+        Session = openSession()
+        session = Session()
+        db.session.add(actor)
+        db.session.commit()
+
+
     def bulk():
         df = actor_preprocess.hook()
         print(df.head())
@@ -243,15 +256,6 @@ class Actors(Resource):
         data = ActorDao.find_all()
         return data, 200
 
-class Auth(Resource):
-    @staticmethod
-    def post():
-        body = request.get_json()
-        actor = ActorDto(**body)
-        ActorDao.save(actor)
-        id = actor.actor_id
-        return {'id': str(id)}, 200 
-
 
 class Access(Resource):
     @staticmethod
@@ -264,3 +268,19 @@ class Access(Resource):
         print(actor.password)
         data = ActorDao.login(actor)
         return data[0], 200
+
+class Auth(Resource):
+    @staticmethod
+    def post():
+        body = request.get_json()
+        actor = ActorDto(**body)
+        ActorDao.save(actor)
+        id = actor.actor_id
+        return {'id': str(id)}, 200 
+
+class AddActor(Resource):
+    @staticmethod
+    def post(name):
+        print("du?????????????????????")
+        ActorDao.add(name)
+        
