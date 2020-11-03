@@ -115,8 +115,28 @@ class UserDao(UserDto):
 
     @staticmethod
     def update(user):
-        db.session.add(user)
-        db.session.commit()
+        print("update")
+        Session = openSession()
+        session = Session()
+        print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print(f"{user.lname}")
+        print(f"{user.fname}")
+        session.query(UserDto).filter(UserDto.user_id == user.user_id).update({UserDto.lname:user.lname,
+                                                                                  UserDto.fname:user.fname,
+                                                                                  UserDto.age:user.age,
+                                                                                  UserDto.password:user.password,
+                                                                                  UserDto.age:user.age,
+                                                                                  UserDto.email:user.email})
+        session.commit()
+        session.close()
+        # return session.query(UserDto).filter(UserDto.user_id.like(f'{user_id}')).one()
+        # 'lname':lname, 'fname':fname, 'age':age,'password':password,'gender':gender,'user_id':email
+        # session.query(UserDto).filter(UserDto.user_id.like(f"{user.user_id}")).update({UserDto.lname:user.lname,
+        #                                                                           UserDto.fname:user.fname,
+        #                                                                           UserDto.age:user.age,
+        #                                                                           UserDto.password:user.password,
+        #                                                                           UserDto.age:user.age,
+        #                                                                           UserDto.email:user.email})
 
     @staticmethod
     def register(user):
@@ -126,12 +146,17 @@ class UserDao(UserDto):
         db.session.add(user)
         print('I am at adddddddddddddddddddddddddddddd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         db.session.commit()
+        
 
     @classmethod
     def delete(cls,id):
         data = cls.query.get(id)
+        print(data)
         db.session.delete(data)
+        print("helo")
         db.session.commit()
+        session.close()
+        
 
     @classmethod
     def find_all(cls):
@@ -198,6 +223,47 @@ if __name__ == "__main__":
                                         
 
 class User(Resource):
+    
+    @staticmethod
+    def put(id:str):
+        print("plz plz plz plzpzlzlzlplzpzlzp")
+        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        parser.add_argument('user_id', type=str, required=True,
+                                                help='This field should be a user_id')
+        parser.add_argument('password', type=str, required=True,
+                                                help='This field should be a password')
+        parser.add_argument('gender', type=str, required=True,
+                                                help='This field should be a gender')
+        parser.add_argument('lname', type=str, required=True,
+                                                help='This field should be a lname')
+        parser.add_argument('fname', type=str, required=True,
+                                                help='This field should be a fname')
+        parser.add_argument('email', type=str, required=True,
+                                                help='This field should be a fname')
+        parser.add_argument('age', type=int, required=True,
+                                        help='This field should be a age')
+                                        
+        print("argument added")
+        # def __init__(self, user_id, password,fname, lname, age, gender,email):
+        args = parser.parse_args()
+        print("00000000000000000000000")
+        print(f'User {args["user_id"]} updated')
+        print(f'User {args["password"]} updated')
+        user = UserDto(args.user_id,args.password,args.fname,args.lname,args.age,args.gender, args.email)
+        print("user created")
+        UserDao.update(user)
+        data = user.json()
+        return data, 200
+
+    @staticmethod
+    def delete(id:str):
+        print("delete entered--------------------------------------------------------")
+        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        parser.add_argument('user_id', type=str, required=True,
+                                                help='This field should be a user_id')
+        args = parser.parse_args()
+        UserDao.delete(args.user_id)
+
 
     @staticmethod
     def post():
@@ -259,8 +325,6 @@ class Auth(Resource):
     def post():
         print("------------------여기는 user.py Auth ------------------- ")
         
-        
-       
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
         parser.add_argument('user_id', type=str, required=True,
                                                 help='This field should be a user_id')
@@ -313,3 +377,11 @@ class Access(Resource):
         print("비밀번호: ", user.password)
         data = UserDao.login(user)
         return data[0], 200
+
+class Delete(Resource):
+    @staticmethod
+    def post(id:str):
+        print("delete 드렁옴~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("그럼 여기?")
+        print("여기까진 옴??")
+        UserDao.delete(id)

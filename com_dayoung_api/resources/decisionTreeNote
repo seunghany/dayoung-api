@@ -1,0 +1,11 @@
+스무고개
+
+무슨 트리로 만들건지
+
+Decision Tree Types
+1. Classification Tree analysis is when the predicted outcome is the class (discrete) to which the data belongs.
+2. Regression tree analysis is when the predicted outcome can be considered a real number (e.g. the price of a house, 
+or a patient's length of stay in a hospital).
+
+스무고개는 discrete data 를 이용하기 떄문에 Classification Tree analysis를 사용할 예정
+

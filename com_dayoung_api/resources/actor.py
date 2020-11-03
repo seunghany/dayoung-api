@@ -21,7 +21,8 @@ class ActorPreprocess(object):
         
         actors_name = ['전지현', "이병한", "손예진"]
         actors_name = ['전지현']
-        actors_name =["수지", "이병헌","한지민", "전지현","손예진","안소희","강동원","하정우","김혜수","현빈" ,"송강호", "이나영", "신민아" ]
+        actors_name =["수지", "이병헌","한지민", "전지현","손예진","안소희","강동원",
+                        "하정우","김혜수","현빈" ,"송강호", "이나영", "신민아" ]
         
         self.crawl = Crawling(actors_name) # 이병헌 is given as default
         # print(self.dataFrame)
@@ -71,6 +72,7 @@ class ActorDto(db.Model):
             'religion' : self.religion,
             'agency' : self.agency
         }
+
 class ActorVo:
     actor_id: str = ''
     photo_url: str = ''
@@ -86,6 +88,7 @@ class ActorVo:
 Session = openSession()
 session = Session()
 actor_preprocess = ActorPreprocess()
+
 
 class ActorDao(ActorDto):
 
@@ -155,6 +158,7 @@ parser = reqparse.RequestParser()  # only allow price changes, no name changes a
 parser.add_argument('actor_id', type=str, required=True,
                                         help='This field should be a actor_id')
 
+
 class ActorDao(ActorDto):
     
     @staticmethod   
@@ -223,11 +227,6 @@ if __name__ == "__main__":
 # ==============================================================
 
 
-
-
-
-
-
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
 parser.add_argument('actorId', type=str, required=True,
                                         help='This field should be a actorId')
@@ -248,6 +247,7 @@ class Actor(Resource):
         for key in params.keys():
             params_str += 'key: {}, value: {}<br>'.format(key, params[key])
         return {'code':0, 'message': 'SUCCESS'}, 200
+
     @staticmethod
     def get(id: str):
         print(f'Actor {id} added ')
@@ -268,7 +268,7 @@ class Actor(Resource):
     @staticmethod
     def delete():
         args = parser.parse_args()
-        print(f'USer {args["id"]} deleted')
+        print(f'Actor {args["id"]} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
 class Actors(Resource):
@@ -288,7 +288,6 @@ class Auth(Resource):
         actor = ActorDto(**body)
         ActorDao.save(actor)
         id = actor.actor_id
-        
         return {'id': str(id)}, 200 
 
 
