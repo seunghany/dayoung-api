@@ -257,11 +257,11 @@ class User(Resource):
     @staticmethod
     def delete(id:str):
         print("delete entered--------------------------------------------------------")
-        parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-        parser.add_argument('user_id', type=str, required=True,
-                                                help='This field should be a user_id')
-        args = parser.parse_args()
-        UserDao.delete(args.user_id)
+        # parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
+        # parser.add_argument('user_id', type=str, required=True,
+        #                                         help='This field should be a user_id')
+        # args = parser.parse_args()
+        UserDao.delete(id)
 
 
     @staticmethod
