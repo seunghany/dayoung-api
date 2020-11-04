@@ -114,17 +114,26 @@ parser.add_argument('actor_id', type=str, required=True,
 class ActorDao(ActorDto):
     
     @staticmethod   
-    def add (actor_name):
+    def add(actor_name):
         crawl = Crawling([actor_name])
-        print("여기 있음")
         df = crawl.crawl()
-        print(df)
-        actor = ActorDto(df.to_dict(orient="records"))
-        print(actor)
+        actor =df.to_dict(orient="records")
+        actor = actor[0]
+        actor = ActorDto(**actor)
+        
+        print("_________________________________________________________________")
+
+        # print("actor 타입 ", type(actor))
+        # print(actor['age'])
+        # print("여기 옴222222222222222222222?")
+        # actor = ActorDto(actor)
+        # print("actor 타입 ", type(actor))
         Session = openSession()
         session = Session()
+        print("--------------------------------------------------------------------------")
         db.session.add(actor)
         db.session.commit()
+        session.close()
 
 
     def bulk():
@@ -199,7 +208,7 @@ if __name__ == "__main__":
 
 
 parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
-parser.add_argument('actorId', type=str, required=True,
+parser.add_argument('actor_id', type=str, required=True,
                                         help='This field should be a actorId')
 parser.add_argument('password', type=str, required=True,
                                         help='This field should be a password')
@@ -281,6 +290,7 @@ class Auth(Resource):
 class AddActor(Resource):
     @staticmethod
     def post(name):
-        print("du?????????????????????")
         ActorDao.add(name)
+        print(f'Actor {name} added')
+        return {'code' : 0, 'message' : 'SUCCESS'}, 200   
         

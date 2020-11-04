@@ -142,7 +142,8 @@ class UserDao(UserDto):
     def register(user):
         Session = openSession()
         session = Session()
-        print('I am at Register!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        print('this is user: ', user)
+        print(type(user), "     이게 타입")
         db.session.add(user)
         print('I am at adddddddddddddddddddddddddddddd!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         db.session.commit()
@@ -379,7 +380,4 @@ class Access(Resource):
 class Delete(Resource):
     @staticmethod
     def post(id:str):
-        print("delete 드렁옴~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("그럼 여기?")
-        print("여기까진 옴??")
         UserDao.delete(id)

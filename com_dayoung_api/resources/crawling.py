@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import re # 정규식 사용
 import csv
 from pandas import DataFrame
+import random
 
 class Crawling:
     '''
@@ -21,7 +22,7 @@ class Crawling:
         # actors_name = ["손예진"]
         actors = []
         actors_name = self.actors_name
-        actor_id = 1
+        actor_id = random.randint(1000,10000)
         for name in actors_name :
             url = "https://ko.wikipedia.org/wiki/"
             url += name
