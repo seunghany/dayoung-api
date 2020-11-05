@@ -24,7 +24,7 @@ class ActorPreprocess(object):
         
     def hook(self):
         dataFrame = self.c.crawl()
-        print(dataFrame)
+        # print(dataFrame)
         return dataFrame
 
 class ActorDto(db.Model):
@@ -41,7 +41,7 @@ class ActorDto(db.Model):
     religion: str = db.Column(db.String(30))
     agency: str = db.Column(db.String(30))
     spouse: str = db.Column(db.String(30))
-    children: str = db.Column(db.String(30))
+    children: str = db.Column(db.String(100))
     debut_year: int = db.Column(db.Integer)
     state: str = db.Column(db.String(1))
     photo_url: str = db.Column(db.String(200))
@@ -120,14 +120,13 @@ class ActorDao(ActorDto):
     
     @staticmethod   
     def add(actor_name):
-        
-        crawl = Crawling([actor_name])
+        crawl = Crawling(actor_name)
         df = crawl.crawl()
         actor = df.to_dict(orient="records")
         actor = actor[0]
         actor = ActorDto(**actor)
         
-        print("_________________________________________________________________")
+        # print("_________________________________________________________________")
 
         # print("actor 타입 ", type(actor))
         # print(actor['age'])
@@ -144,8 +143,6 @@ class ActorDao(ActorDto):
 
     def bulk():
         df = actor_preprocess.hook()
-        print(df)
-        print("-------------------------------------------------------------")
         print(df.head())
         session.bulk_insert_mappings(ActorDto, df.to_dict(orient="records"))
         session.commit()
@@ -167,15 +164,23 @@ class ActorDao(ActorDto):
 
     @classmethod
     def delete(cls,id):
+        # this deletes actor from the whole database
         data = cls.query.get(id)
         db.session.delete(data)
         db.session.commit()
+        session.close()
 
     @classmethod
     def find_all(cls):
         sql = cls.query
         df = pd.read_sql(sql.statement, sql.session.bind)
         return json.loads(df.to_json(orient='records'))
+    
+    @classmethod
+    def find_state_one(cls):
+        return session.query(ActorDto).filter(ActorDto.state.like("1")).all()
+        
+        # session.query(ActorDto).filter(ActorDto.state.like("1")).all()
 
     @classmethod
     def find_by_name(cls, name):
@@ -184,6 +189,10 @@ class ActorDao(ActorDto):
     @classmethod
     def find_by_id(cls, actor_id):
         return session.query(ActorDto).filter(ActorDto.actor_id.like(f'{actor_id}')).one()
+
+    @classmethod
+    def find_id_by_name(cls,name):
+        return session.query(ActorDto).filter(ActorDto.name.like(f'{name}')).one()
 
 
     @classmethod
@@ -196,11 +205,20 @@ class ActorDao(ActorDto):
         return json.loads(df.to_json(orient='records'))
 
     @classmethod
-    def delete_actor(cls,id):
-        data = cls.query.get(id)
-        db.session.delete(data)
-        db.session.commit()
+    def delete_actor_by_setting_state_to_one(cls,id):
+        # This does not delete Actor from the database but rather simply updates 
+        # actor column "state" to 0 which will hide its display from the user 
+        # where as user will think that the selected actor has been deleted
+        session.query(ActorDto).filter(ActorDto.actor_id == id).update({ActorDto.state:"0"}, synchronize_session=False)
+        session.commit()
         session.close()
+    
+    @classmethod
+    def add_actor_by_setting_state_to_one(cls,id):
+        session.query(ActorDto).filter(ActorDto.actor_id == id).update({ActorDto.state:"1"}, synchronize_session=False)
+        session.commit()
+        session.close()
+
 
 
 if __name__ == "__main__":
@@ -259,7 +277,7 @@ class Actor(Resource):
         print("-------------------------------")
         print("-------------------------------")
         print("-------------------------------")
-        ActorDao.delete_actor(id)
+        ActorDao.delete_actor_by_setting_state_to_one(id)
         print(f'Actor {id} deleted')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200    
 
@@ -270,8 +288,15 @@ class Actors(Resource):
         ud.bulk('actors')
     @staticmethod
     def get():
-        data = ActorDao.find_all()
-        return data, 200
+        # find all 하지 말고
+        # state 가 1 인 것만!
+        # data = ActorDao.find_all()
+        actors = ActorDao.find_state_one()
+        # 여기서 이제 review를 제이슨화 시킨후 보내주면 됨
+        data = []
+        for actor in actors:
+            data.append(actor.json())
+        return data[:]
 
 
 class Access(Resource):
@@ -298,7 +323,8 @@ class Auth(Resource):
 class AddActor(Resource):
     @staticmethod
     def post(name):
-        ActorDao.add(name)
+        id = ActorDao.find_id_by_name(name)
+        ActorDao.add_actor_by_setting_state_to_one(id)
         print(f'Actor {name} added')
         return {'code' : 0, 'message' : 'SUCCESS'}, 200   
         

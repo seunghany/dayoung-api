@@ -12,7 +12,7 @@ class Crawling:
         returns Dataframe with above attributes
         '''
     def __init__(self, actors_name = ['이병헌'], gender = 'm'):
-        self.actors_name = None
+        self.actors_name = [(actors_name, gender)]
         self.gender = 'm'
 
     def crawl(self):
@@ -30,6 +30,7 @@ class Crawling:
         actors_name.extend(actors_name_2)
         actor_id = 1
         # actors_name = ["이병헌", "이진욱"]
+        actors_name = [('이병헌', "m")]
         data = self.actors_to_df(actors_name, actor_id)
         return data
 
@@ -93,7 +94,10 @@ class Crawling:
                 # print("문제 있음")
                 continue
             url2 = url_table.find('img')['src']
+            if len(url2) > 200:
+                continue
             actor_info['photo_url'] = url2
+            
             tables = tables[2:]
             actor = {}
             for table in tables:
@@ -116,11 +120,7 @@ class Crawling:
             age = age[:-1]
             actor_info['age'] = age
             actor_info['actor_id'] = actor_id
-            actor_id +=1
-            if actor_id < 13:
-                actor['state'] = "1"
-            else:
-                actor['state'] = "0"
+            
             
             # 가명 없을 시 없다고 표시 본명에 가명 없음 이라고 표시
             actor_info['name'] = name
@@ -137,17 +137,26 @@ class Crawling:
             if '소속사' not in actor.keys():
                 actor_info['agency'] = 'no angency'
             else:
+                if len(actor['소속사']) > 30:
+                    continue
                 actor_info['agency'] = actor['소속사']
             # 배우자
             if '배우자' not in actor.keys():
                 actor_info['spouse'] = 'no spouse'
             else:
+                if len(actor['배우자']) > 30:
+                    continue
                 actor_info['spouse'] = actor['배우자']
             # 자녀
+
             if '자녀' not in actor.keys():
                 actor_info['children'] = 'no child'
             else:
+                if len(actor['자녀'])>100:
+                    continue
                 actor_info['children'] = actor['자녀']
+                
+            
             # 활동 기간 - 정규식 이용
             # 데뷔년도
             p = re.compile('....년')
@@ -158,17 +167,23 @@ class Crawling:
             debut_year = p.findall(actor['활동 기간'])[0][:-1]
             actor_info['debut_year'] = debut_year
             actor_info['gender'] = self.gender
-            # print(actor_info)
             actors.append(actor_info)
-            if actor_id > 3:
-                print("---------------------------------")
-                
-                break
+            actor_id +=1
+            if actor_id < 13:
+                actor_info['state'] = "1"
+            else:
+                actor_info['state'] = "0"
+            if actor_id%50 == 10:
+                print("working on it", actor_id)
+                print("하고 있어!!!!!!!")
+                print("하고 있어!!!!!!!")
+                print("하고 있어!!!!!!!")
+                print("하고 있어!!!!!!!")
+                print("하고 있어!!!!!!!")
         print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 
         # dict_keys(['photo_url', 'age', 'actor_id', 'name', 'real_name', 'religion', 'agency', 'spouse', 'children', 'debut_year', 'gender'])
-        data = DataFrame(actors, columns=['photo_url', 'age', 'actor_id', 'name', 'real_name', 'religion', 'agency', 'spouse', 'children', 'debut_year', 'gender'])
-        print()
+        data = DataFrame(actors, columns=['photo_url', 'age', 'actor_id', 'name', 'real_name', 'religion', 'agency', 'spouse', 'children', 'debut_year', 'gender','state'])
         return data
 
 
