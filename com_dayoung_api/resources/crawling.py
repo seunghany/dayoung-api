@@ -171,7 +171,7 @@ class Crawling:
             actor_info['debut_year'] = debut_year
             actor_info['gender'] = self.gender
             actors.append(actor_info)
-            actor_id +=1
+            actor_id += 1
             if actor_id < 13:
                 # 처음 내가 보여주고 싶은 12명
                 actor_info['state'] = "1"

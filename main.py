@@ -1,10 +1,18 @@
+"""
+This is main file
+
+Creates table for use and connects database to SQLALCHEMY
+
+"""
+
 from flask import Flask
 from flask_restful import Api
+from flask_cors import CORS
 from com_dayoung_api.ext.db import url, db
 from com_dayoung_api.ext.routes import initialize_routes
 from com_dayoung_api.resources.user import UserDao
 from com_dayoung_api.resources.actor import ActorDao
-from flask_cors import CORS
+
 
 app = Flask(__name__)
 CORS(app, resources={r'/api/*': {"origins": "*"}}) # api open subdomain
@@ -26,4 +34,3 @@ with app.app_context():
         ActorDao.bulk()
 
 initialize_routes(api)
-
