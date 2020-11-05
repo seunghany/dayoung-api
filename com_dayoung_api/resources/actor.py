@@ -192,7 +192,9 @@ class ActorDao(ActorDto):
 
     @classmethod
     def find_id_by_name(cls,name):
+        # 여기 나중에 조금 고쳐야 할 함
         actor = session.query(ActorDto).filter(ActorDto.name.like(f'{name}')).one()
+        print(actor.actor_id)
         return actor.actor_id
 
 
@@ -325,9 +327,10 @@ class AddActor(Resource):
     @staticmethod
     def post(name):
         try:
+            print(name)
             id = ActorDao.find_id_by_name(name)
         except Exception as e:
-            return {'message': 'Actor not found in the database'}, 404
+            return {'message': 'Actor not found in the database'}, 401
         try:
             ActorDao.add_actor_by_setting_state_to_one(id)
             print(f'Actor {name} added')
