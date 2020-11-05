@@ -192,7 +192,8 @@ class ActorDao(ActorDto):
 
     @classmethod
     def find_id_by_name(cls,name):
-        return session.query(ActorDto).filter(ActorDto.name.like(f'{name}')).one()
+        actor = session.query(ActorDto).filter(ActorDto.name.like(f'{name}')).one()
+        return actor.actor_id
 
 
     @classmethod
@@ -323,8 +324,13 @@ class Auth(Resource):
 class AddActor(Resource):
     @staticmethod
     def post(name):
-        id = ActorDao.find_id_by_name(name)
-        ActorDao.add_actor_by_setting_state_to_one(id)
-        print(f'Actor {name} added')
-        return {'code' : 0, 'message' : 'SUCCESS'}, 200   
+        try:
+            id = ActorDao.find_id_by_name(name)
+        except Exception as e:
+            return {'message': 'Actor not found in the database'}, 404
+        try:
+            ActorDao.add_actor_by_setting_state_to_one(id)
+            print(f'Actor {name} added')
+        except Exception as e:
+            return {'message': 'Actor Already displayed'}, 404   
         
