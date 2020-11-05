@@ -169,9 +169,8 @@ class UserDao(UserDto):
         유저 정보를 수정해 준다
         새로운 유저 정보를 가진 유저를 가져와 기존의
         유저 정보를 수정해 준다.
-        Args:
-            user ([User]): [새로운 유저 정보를 가진 유저]
-        
+
+        Parameter: 새로운 유저 정보를 가진 유저
         """
         Session = openSession()
         session = Session()
@@ -335,13 +334,18 @@ class User(Resource):
 
     @staticmethod
     def get(id: str):
+        """
+        유저 아이디를 받아와 해당 유저 객채를 리턴한다
+        Parameter: User ID 를 받아온다
+        return: 해당 아이디 유저 객채
+        """
         print(f'::::::::::::: User {id} added ')
         try:
             user = UserDao.find_by_id(id)
             data = user.json()
             return data, 200
         except Exception as e:
-            print('failed')
+            print(e)
             return {'message': 'User not found'}, 404
 
     # @staticmethod
@@ -358,13 +362,22 @@ class User(Resource):
 
 
 class Users(Resource):
+    """
+    서버와 정보를 주고 받는다.
+    """
     @staticmethod
     def post():
+        """
+        모든 유저 정보를 데이터 베이스 안에 넣어준다
+        """
         ud = UserDao()
         ud.bulk('users')
 
     @staticmethod
     def get():
+        """
+        데이터 베이스 안에 있는 모든 유저 정보를 찾아서 리턴해준다.
+        """
         data = UserDao.find_all()
         print("list : ", type(data))
         return data, 200
@@ -374,8 +387,10 @@ class Auth(Resource):
     # self, user_id, password,fname, lname, age, gender,email
     @staticmethod
     def post():
+        """
+        유저 정보를 받아와 새로운 유저를 생성해 준다.
+        """
         print("------------------여기는 user.py Auth ------------------- ")
-
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
         parser.add_argument('user_id', type=str, required=True,
                                                 help='This field should be a user_id')
@@ -402,11 +417,17 @@ class Auth(Resource):
         print("이름 :", user.fname)
         print("나이 :", user.age)
         print("성별 :", user.gender)
-        UserDao.register(user)  # return 하긴 함
-        return "worked"
+        try:
+            UserDao.register(user)  # return 하긴 함
+            return "worked"
+        except Exception as e:
+            return e
 
 
 class Access(Resource):
+    """
+    서버와 정보를 주고 받는다.
+    """
     @staticmethod
     def post():
         parser = reqparse.RequestParser()  # only allow price changes, no name changes allowed
@@ -427,6 +448,12 @@ class Access(Resource):
 
 
 class Delete(Resource):
+    """
+    정보를 받아와 유저 정보를 삭제 한다
+    """
     @staticmethod
     def post(id: str):
+        """
+        Parameter: 유저 아이디를 받아온다.
+        """
         UserDao.delete(id)
